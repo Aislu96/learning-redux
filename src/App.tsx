@@ -1,8 +1,8 @@
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
-import store, {AppState, CounterId, DecrementAction, IncrementAction} from "./store.ts";
-import {useEffect, useReducer, useRef} from "react";
+import {CounterId, DecrementAction, IncrementAction, selectCounter, useAppSelector} from "./store.ts";
+import {useDispatch} from "react-redux";
 
 function App() {
     return (
@@ -31,38 +31,23 @@ function App() {
     );
 }
 
-const selectCounter = (state: AppState, counterId: CounterId) => state.counters[counterId];
-
 // Компонент Counter принимает пропс counterId
-export function Counter({ counterId }: { counterId: CounterId }) {
-    const [, forceUpdate] = useReducer((x) => x + 1, 0);
-    const lastStateRef = useRef<ReturnType<typeof selectCounter>>();
-
-
-    useEffect(() => {
-        return store.subscribe(() => {
-            const currentState = selectCounter(store.getState(), counterId);
-            const lastState = lastStateRef.current;
-            if (currentState !== lastState) {
-                forceUpdate();
-            }
-            lastStateRef.current = currentState;
-        });
-    }, []);
-
-    const counterState = selectCounter(store.getState(), counterId);
-
+export function Counter({counterId}: { counterId: CounterId }) {
+    const dispatch = useDispatch();
+    const counterState = useAppSelector((state) => selectCounter(state, counterId));
     return (
         <div>
             <p>counter {counterState?.counter}</p>
-            <button onClick={() => store.dispatch({
+            <button onClick={() => dispatch({
                 type: 'increment',
-                payload: { counterId }
-            } as IncrementAction)}>increment</button>
-            <button onClick={() => store.dispatch({
+                payload: {counterId}
+            } as IncrementAction)}>increment
+            </button>
+            <button onClick={() => dispatch({
                 type: 'decrement',
-                payload: { counterId }
-            } as DecrementAction)}>decrement</button>
+                payload: {counterId}
+            } as DecrementAction)}>decrement
+            </button>
         </div>
     );
 }

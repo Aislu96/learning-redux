@@ -1,4 +1,5 @@
 import {configureStore} from '@reduxjs/toolkit';
+import {useDispatch, useSelector, useStore} from "react-redux";
 
 type CounterState = {
     counter: number;
@@ -21,7 +22,6 @@ const initialState: State = {
 };
 
 const reducer = (state = initialState, action: Action): State => {
-    debugger
     switch (action.type) {
         case 'increment': {
             const {counterId} = action.payload;
@@ -46,5 +46,11 @@ const store = configureStore({
 });
 
 export type AppState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export const selectCounter = (state: AppState, counterId: CounterId) => state.counters[counterId];
 
 export default store;
+
+export const useAppSelector = useSelector.withTypes<AppState>();
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
+export const useAppStore = useStore.withTypes<typeof store>()
